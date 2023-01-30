@@ -1,0 +1,70 @@
+* {
+  --gb-ideal-width: 40vw;
+ }
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  border: 1px solid blue;
+}
+
+#utilities {
+  width: 75px;
+  height: 25px;
+  align-self: end;
+  margin-right: 10vw;
+  border: 1px solid blue;
+}
+
+#game-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: clamp(300px, 100vw, 1200px);
+  border: 1px solid orange;
+}
+
+#gameboard {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(100px, 150px));
+  grid-template-rows: repeat(3, minmax(100px, 150px));
+  width: clamp(320px, var(--gb-ideal-width), 470px);
+  height: clamp(320px, var(--gb-ideal-width), 470px);
+  grid-gap: 10px;
+  background-color: black;
+  border: 1px solid red;
+}
+
+#player-x-text,
+#player-o-text {
+  min-height: 20px;
+}
+
+.player-card-x,
+.player-card-o {
+  min-width: 125px; /* not sure why needed */
+  width: clamp(125px, 20vw, 200px);
+  min-height: 125px; /* again, not sure why needed */
+  height: clamp(125px, 20vw, 200px);
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid purple;
+}
+
+.player-team,
+.value {
+  font-size: 4em;
+}
+
+.gamespace {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+}
+
