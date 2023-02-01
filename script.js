@@ -17,29 +17,28 @@ const Gameboard = (() => {
   const gamespaces = document.getElementsByClassName('gamespace');
 
   // bind events
-  for (let el = 0; el < gameboard.length; el++) {
+  for (let el in gameboard) {
     gamespaces[el].addEventListener('click', function() {
       if (playerX.isTurn && !gameboard[el]) {
         makeMove('X', el);
         GameController.swapTurn();
+        GameController.endGameCheck();
       } else if (playerO.isTurn && !gameboard[el]) {
         makeMove('O', el);
         GameController.swapTurn();
+        GameController.endGameCheck();
       }
     });
   }
 
   function _render() {
-    // console.log(gameboard);
-    for (space in gameboard) {
+    for (let space in gameboard) {
       if (gameboard[space]) { // if gamespace value exists
         gamespaces[space].querySelector('p').innerText = gameboard[space]; // draw board
       } else {
         gamespaces[space].querySelector('p').innerText = "";
       }
     }
-    // console.log(gamespaces);
-    // console.log(playerXText);
   }
 
   function _init() {
@@ -51,9 +50,34 @@ const Gameboard = (() => {
     _render();
   }
 
+  function gameWinner() {
+    // check diagonals
+    if (gameboard[2] && gameboard[4] == gameboard[2] && gameboard[6] == gameboard[4]) {
+      return gameboard[2];
+    } else if (gameboard[0] && gameboard[0] == gameboard[4] && gameboard[4] == gameboard[8]) {
+      return gameboard[0];
+    }
+
+    // check rows 
+    for (let i = 0; i < 3; i++) {
+      if (gameboard[3 * i] && gameboard[3 * i] == gameboard[3 * i + 1] && gameboard[3 * i] == gameboard[3 * i + 2]) {
+        return gameboard[3 * i];
+      }
+    }
+
+    // check columns
+    for (let j = 0; j < 3; j++) {
+      if (gameboard[j] && gameboard[j] == gameboard[j + 3] && gameboard[j] == gameboard[j + 6]) {
+        return gameboard[j];
+      }
+    }
+
+    return false;
+  }
+
   function resetBoard() {
-    for (let i = 0; i < gameboard.length; i++) {
-      gameboard[i] = null;
+    for (let index = 0; index < gameboard.length; index++) {
+      gameboard[index] = null;
     }
     _render();
   }
@@ -62,6 +86,7 @@ const Gameboard = (() => {
 
   return {
     makeMove,
+    gameWinner,
     resetBoard,
   }
 })();
@@ -71,6 +96,9 @@ const GameController = (() => {
   // cache DOM
   const playerXText = document.getElementById('player-x-text');
   const playerOText = document.getElementById('player-o-text');
+  const newGameBtn = document.getElementsByTagName('button');
+
+  newGameBtn[0].addEventListener('click', newGame);
 
   function newGame() {
     let _goesFirst = (Math.round(Math.random())); // 0 or 1, coinflip
@@ -84,16 +112,31 @@ const GameController = (() => {
     _consoleTurns();
     Gameboard.resetBoard();
   }
-
+  
   function swapTurn() {
     playerX.isTurn = (playerX.isTurn) ? false : true;
     playerO.isTurn = (playerO.isTurn) ? false : true;
     _consoleTurns();
   }
 
+  function endGameCheck() {
+    if (Gameboard.gameWinner() == 'X') {
+      playerXText.innerText = "wins!";
+      playerOText.innerText = "";
+    } else if (Gameboard.gameWinner() == 'O') {
+      playerXText.innerText = "";
+      playerOText.innerText = "wins!";
+    }
+  }
+
   function _consoleTurns() {
-    console.log("playerX's turn: " + playerX.isTurn + "\n")
-    console.log("playerO's turn: " + playerO.isTurn)
+    console.log("playerX's turn: " + playerX.isTurn + "\n");
+    console.log("playerO's turn: " + playerO.isTurn + "\n");
+    if (!Gameboard.gameWinner()) {
+      console.log("game continues\n")
+    } else {
+      console.log("winner: Player \'" + Gameboard.gameWinner() + "\'\n");
+    }
 
     if (playerX.isTurn) {
       playerXText.innerText = "turn";
@@ -107,8 +150,7 @@ const GameController = (() => {
   return {
     newGame,
     swapTurn,
+    endGameCheck,
   }
 })();
 
-const newGameBtn = document.getElementsByTagName('button');
-newGameBtn[0].addEventListener('click', GameController.newGame);
